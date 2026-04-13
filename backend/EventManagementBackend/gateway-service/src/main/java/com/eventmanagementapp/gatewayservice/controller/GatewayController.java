@@ -3,23 +3,28 @@ package com.eventmanagementapp.gatewayservice.controller;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.ResourceAccessException;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Enumeration;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
 public class GatewayController {
 
-    private static final String STUDENT_SERVICE = "http://localhost:8081";
-    private static final String FACULTY_SERVICE = "http://localhost:8082";
-    private static final String EVENT_SERVICE = "http://localhost:8083";
+    private static final String STUDENT_SERVICE = "http://student-service:8081";
+    private static final String FACULTY_SERVICE = "http://faculty-service:8082";
+    private static final String EVENT_SERVICE = "http://event-service:8083";
 
     @Autowired
     private RestTemplate restTemplate;
@@ -83,10 +88,22 @@ public class GatewayController {
 
             HttpEntity<String> entity = new HttpEntity<>(body, headers);
 
-            return restTemplate.exchange(url, httpMethod, entity, String.class);
+            ResponseEntity<String> response = restTemplate.exchange(url, httpMethod, entity, String.class);
+            return ResponseEntity.status(response.getStatusCode())
+                .headers(copyResponseHeaders(response.getHeaders()))
+                .body(response.getBody());
+        } catch (RestClientResponseException e) {
+            return ResponseEntity.status(e.getStatusCode())
+                .headers(copyResponseHeaders(e.getResponseHeaders()))
+                .body(e.getResponseBodyAsString());
+        } catch (ResourceAccessException e) {
+            return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("message", "Downstream service is unavailable"));
         } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(500).body("Gateway error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(Map.of("message", "Gateway error", "details", e.getMessage()));
         }
     }
 
@@ -105,5 +122,19 @@ public class GatewayController {
             && !"Content-Length".equalsIgnoreCase(headerName)
             && !"Transfer-Encoding".equalsIgnoreCase(headerName)
             && !"Connection".equalsIgnoreCase(headerName);
+    }
+
+    private HttpHeaders copyResponseHeaders(HttpHeaders originalHeaders) {
+        HttpHeaders headers = new HttpHeaders();
+        if (originalHeaders == null) {
+            return headers;
+        }
+
+        MediaType contentType = originalHeaders.getContentType();
+        if (contentType != null) {
+            headers.setContentType(contentType);
+        }
+
+        return headers;
     }
 }

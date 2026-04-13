@@ -22,14 +22,13 @@ export default function Register() {
     setError('');
     setSuccess('');
 
-    const response = await api.student.register(formData);
-    if (response.message) {
-      setError(response.message);
-      return;
+    try {
+      await api.student.register(formData);
+      setSuccess('Registration successful! Redirecting to login...');
+      setTimeout(() => navigate('/'), 2000);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Registration failed');
     }
-
-    setSuccess('Registration successful! Redirecting to login...');
-    setTimeout(() => navigate('/'), 2000);
   };
 
   return (

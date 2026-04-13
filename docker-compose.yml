@@ -1,0 +1,85 @@
+services:
+  mongodb:
+    image: mongo:7
+    container_name: mongodb
+    restart: unless-stopped
+    volumes:
+      - mongodb_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  gateway-service:
+    build:
+      context: .
+      dockerfile: docker/gateway-service/Dockerfile
+    container_name: gateway-service
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_MONGODB_URI=mongodb://mongodb:27017/EventsMgmtDB
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  student-service:
+    build:
+      context: .
+      dockerfile: docker/student-service/Dockerfile
+    container_name: student-service
+    restart: unless-stopped
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_MONGODB_URI=mongodb://mongodb:27017/EventsMgmtDB
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  faculty-service:
+    build:
+      context: .
+      dockerfile: docker/faculty-service/Dockerfile
+    container_name: faculty-service
+    restart: unless-stopped
+    ports:
+      - "8082:8082"
+    environment:
+      - SPRING_MONGODB_URI=mongodb://mongodb:27017/EventsMgmtDB
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  event-service:
+    build:
+      context: .
+      dockerfile: docker/event-service/Dockerfile
+    container_name: event-service
+    restart: unless-stopped
+    ports:
+      - "8083:8083"
+    environment:
+      - SPRING_MONGODB_URI=mongodb://mongodb:27017/EventsMgmtDB
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/frontend/Dockerfile
+    container_name: frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - gateway-service
+
+volumes:
+  mongodb_data:

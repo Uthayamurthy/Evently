@@ -64,12 +64,17 @@ export default function StudentApply() {
       eventDescription: formData.eventDescription,
     };
 
-    const response = await api.od.apply(odData);
-    if (response.id) {
-      setSuccess('OD application submitted successfully!');
-      setTimeout(() => navigate('/student/dashboard'), 2000);
-    } else {
+    try {
+      const response = await api.od.apply(odData);
+      if (response.id) {
+        setSuccess('OD application submitted successfully!');
+        setTimeout(() => navigate('/student/dashboard'), 2000);
+        return;
+      }
+
       setError('Failed to submit OD application');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Failed to submit OD application');
     }
   };
 

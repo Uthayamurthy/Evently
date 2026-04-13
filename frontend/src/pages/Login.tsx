@@ -15,18 +15,22 @@ export default function Login() {
     e.preventDefault();
     setError('');
 
-    const response =
-      loginRole === 'STUDENT'
-        ? await api.student.login(email, password)
-        : await api.faculty.login(email, password);
+    try {
+      const response =
+        loginRole === 'STUDENT'
+          ? await api.student.login(email, password)
+          : await api.faculty.login(email, password);
 
-    if (response.token) {
-      login(response);
-      navigate(loginRole === 'STUDENT' ? '/student/dashboard' : '/faculty/dashboard');
-      return;
+      if (response.token) {
+        login(response);
+        navigate(loginRole === 'STUDENT' ? '/student/dashboard' : '/faculty/dashboard');
+        return;
+      }
+
+      setError('Invalid credentials');
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'Login failed');
     }
-
-    setError(response.message || 'Invalid credentials');
   };
 
   return (
