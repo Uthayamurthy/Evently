@@ -79,7 +79,7 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
         </SidebarFooter>
       </Sidebar>
-      <SidebarInset className="flex-1 w-full bg-slate-50 relative h-[100dvh] overflow-y-auto">
+      <SidebarInset className="min-w-0 flex-1 bg-slate-50 relative h-[100dvh] overflow-y-auto">
         <div className="absolute top-4 left-4 z-50 md:hidden">
           <SidebarTrigger />
         </div>
