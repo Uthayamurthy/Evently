@@ -6,6 +6,9 @@ import StudentDashboard from './pages/StudentDashboard';
 import StudentApply from './pages/StudentApply';
 import FacultyDashboard from './pages/FacultyDashboard';
 import FacultyRecords from './pages/FacultyRecords';
+import { FacultyLayout } from './components/layout/FacultyLayout';
+import { StudentLayout } from './components/layout/StudentLayout';
+import { TooltipProvider } from '@/components/ui/tooltip';
 
 function ProtectedRoute({ children, allowedRole }: { children: React.ReactNode; allowedRole: string }) {
   const { token, role } = useAuth();
@@ -38,7 +41,9 @@ function AppRoutes() {
         path="/student/dashboard"
         element={
           <ProtectedRoute allowedRole="STUDENT">
-            <StudentDashboard />
+            <StudentLayout>
+              <StudentDashboard />
+            </StudentLayout>
           </ProtectedRoute>
         }
       />
@@ -46,7 +51,9 @@ function AppRoutes() {
         path="/student/apply"
         element={
           <ProtectedRoute allowedRole="STUDENT">
-            <StudentApply />
+            <StudentLayout>
+              <StudentApply />
+            </StudentLayout>
           </ProtectedRoute>
         }
       />
@@ -54,7 +61,9 @@ function AppRoutes() {
         path="/faculty/dashboard"
         element={
           <ProtectedRoute allowedRole="FACULTY">
-            <FacultyDashboard />
+            <FacultyLayout>
+              <FacultyDashboard />
+            </FacultyLayout>
           </ProtectedRoute>
         }
       />
@@ -62,7 +71,9 @@ function AppRoutes() {
         path="/faculty/records"
         element={
           <ProtectedRoute allowedRole="FACULTY">
-            <FacultyRecords />
+            <FacultyLayout>
+              <FacultyRecords />
+            </FacultyLayout>
           </ProtectedRoute>
         }
       />
@@ -73,9 +84,11 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <AppRoutes />
-      </BrowserRouter>
+      <TooltipProvider>
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
     </AuthProvider>
   );
 }
