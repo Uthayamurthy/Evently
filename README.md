@@ -130,6 +130,15 @@ src/main/java/com/eventmanagementapp/<service>/
    ./mvnw spring-boot:run
    ```
 
+Local development defaults:
+- MongoDB URI: `mongodb://localhost:27017/EventsMgmtDB`
+- Gateway downstream URLs:
+  - `http://localhost:8081`
+  - `http://localhost:8082`
+  - `http://localhost:8083`
+
+Docker deployment overrides these with container hostnames through `docker-compose.yml`.
+
 ### Frontend Setup
 
 1. Navigate to the frontend directory:

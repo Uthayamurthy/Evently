@@ -1,6 +1,7 @@
 package com.eventmanagementapp.gatewayservice.controller;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -22,34 +23,39 @@ import java.util.stream.Collectors;
 @RequestMapping("/api")
 public class GatewayController {
 
-    private static final String STUDENT_SERVICE = "http://student-service:8081";
-    private static final String FACULTY_SERVICE = "http://faculty-service:8082";
-    private static final String EVENT_SERVICE = "http://event-service:8083";
+    @Value("${services.student.url:http://localhost:8081}")
+    private String studentServiceUrl;
+
+    @Value("${services.faculty.url:http://localhost:8082}")
+    private String facultyServiceUrl;
+
+    @Value("${services.event.url:http://localhost:8083}")
+    private String eventServiceUrl;
 
     @Autowired
     private RestTemplate restTemplate;
 
     @RequestMapping("/student/**")
     public ResponseEntity<?> forwardToStudent(HttpServletRequest request) {
-        String url = buildTargetUrl(request, STUDENT_SERVICE, "/api/student", "/student");
+        String url = buildTargetUrl(request, studentServiceUrl, "/api/student", "/student");
         return forwardRequest(request, url);
     }
 
     @RequestMapping("/faculty/**")
     public ResponseEntity<?> forwardToFaculty(HttpServletRequest request) {
-        String url = buildTargetUrl(request, FACULTY_SERVICE, "/api/faculty", "/faculty");
+        String url = buildTargetUrl(request, facultyServiceUrl, "/api/faculty", "/faculty");
         return forwardRequest(request, url);
     }
 
     @RequestMapping("/events/**")
     public ResponseEntity<?> forwardToEvent(HttpServletRequest request) {
-        String url = buildTargetUrl(request, EVENT_SERVICE, "/api/events", "/events");
+        String url = buildTargetUrl(request, eventServiceUrl, "/api/events", "/events");
         return forwardRequest(request, url);
     }
 
     @RequestMapping("/od/**")
     public ResponseEntity<?> forwardToOD(HttpServletRequest request) {
-        String url = buildTargetUrl(request, EVENT_SERVICE, "/api/od", "/od");
+        String url = buildTargetUrl(request, eventServiceUrl, "/api/od", "/od");
         return forwardRequest(request, url);
     }
 
