@@ -1,12 +1,32 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import type { ODRequest } from '../types';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Label } from '@/components/ui/label';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { FileSearch, MapPin, CalendarDays, Search, CheckCircle, XCircle } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function FacultyRecords() {
-  const navigate = useNavigate();
-  const [year, setYear] = useState(new Date().getFullYear());
-  const [month, setMonth] = useState(new Date().getMonth() + 1);
+  const [year, setYear] = useState<string>(new Date().getFullYear().toString());
+  const [month, setMonth] = useState<string>((new Date().getMonth() + 1).toString());
   const [records, setRecords] = useState<ODRequest[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
@@ -15,7 +35,7 @@ export default function FacultyRecords() {
     setLoading(true);
     setSearched(true);
     try {
-      const data = await api.od.getByMonth(year, month);
+      const data = await api.od.getByMonth(parseInt(year), parseInt(month));
       setRecords(data);
     } catch (error) {
       console.error('Failed to load records:', error);
@@ -25,118 +45,175 @@ export default function FacultyRecords() {
     }
   };
 
-  const getMonthName = (m: number) => {
-    const months = [
-      'January', 'February', 'March', 'April', 'May', 'June',
-      'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return months[m - 1];
-  };
+  const months = [
+    { value: '1', label: 'January' },
+    { value: '2', label: 'February' },
+    { value: '3', label: 'March' },
+    { value: '4', label: 'April' },
+    { value: '5', label: 'May' },
+    { value: '6', label: 'June' },
+    { value: '7', label: 'July' },
+    { value: '8', label: 'August' },
+    { value: '9', label: 'September' },
+    { value: '10', label: 'October' },
+    { value: '11', label: 'November' },
+    { value: '12', label: 'December' },
+  ];
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-blue-600 text-white p-4">
-        <div className="container mx-auto">
-          <button onClick={() => navigate('/faculty/dashboard')} className="text-white">
-            Back to Dashboard
-          </button>
-        </div>
-      </nav>
-
-      <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold mb-6">Approved OD Records</h1>
-
-        <div className="bg-white rounded-lg shadow p-6 mb-6">
-          <div className="flex gap-4 items-end">
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">Year</label>
-              <input
-                type="number"
-                value={year}
-                onChange={(e) => setYear(parseInt(e.target.value))}
-                className="w-32 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                min="2000"
-                max="2100"
-              />
-            </div>
-            <div>
-              <label className="block text-gray-700 text-sm font-bold mb-2">Month</label>
-              <select
-                value={month}
-                onChange={(e) => setMonth(parseInt(e.target.value))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => (
-                  <option key={m} value={m}>
-                    {getMonthName(m)}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <button
-              onClick={handleSearch}
-              className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
-            >
-              Search
-            </button>
-          </div>
+    <div className="p-8 h-full overflow-auto">
+      <div className="flex flex-col gap-6 max-w-6xl mx-auto">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Approved OD Records</h2>
+          <p className="text-muted-foreground mt-2">
+            Look up previously approved or rejected On-Duty records by month.
+          </p>
         </div>
 
-        {loading ? (
-          <p>Loading...</p>
-        ) : searched && records.length === 0 ? (
-          <p className="text-gray-600">No approved OD records found for this month.</p>
-        ) : records.length > 0 ? (
-          <div className="bg-white rounded-lg shadow overflow-hidden">
-            <table className="min-w-full">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Student
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Event
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Location
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Date
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Status
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
-                {records.map((record) => (
-                  <tr key={record.id}>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">
-                        {record.studentName}
-                      </div>
-                      <div className="text-sm text-gray-500">{record.studentRollNumber}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {record.eventName}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {record.eventLocation}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {record.eventDate}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                        {record.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : null}
+        <Card>
+          <CardHeader>
+            <CardTitle>Filter Records</CardTitle>
+            <CardDescription>Select a year and month to view historical processed requests.</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-4 items-end">
+              <div className="grid gap-2 w-full sm:w-[150px]">
+                <Label htmlFor="year">Year</Label>
+                <Input
+                  id="year"
+                  type="number"
+                  value={year}
+                  onChange={(e) => setYear(e.target.value)}
+                  className="rounded-md"
+                  min="2000"
+                  max="2100"
+                />
+              </div>
+              <div className="grid gap-2 w-full sm:w-[200px]">
+                <Label htmlFor="month">Month</Label>
+                <Select value={month} onValueChange={setMonth}>
+                  <SelectTrigger id="month">
+                    <SelectValue placeholder="Select Month" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((m) => (
+                      <SelectItem key={m.value} value={m.value}>
+                        {m.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <Button onClick={handleSearch} className="w-full sm:w-auto mt-4 sm:mt-0" disabled={loading}>
+                <Search className="mr-2 h-4 w-4" />
+                {loading ? "Searching..." : "Search"}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+
+        {searched && (
+          <Card>
+             <CardHeader>
+              <CardTitle>Search Results</CardTitle>
+              <CardDescription>Found {records.length} processed request(s) for the selected period.</CardDescription>
+            </CardHeader>
+            <CardContent className="p-0">
+               <Table>
+                <TableHeader>
+                  <TableRow className="bg-muted/50">
+                    <TableHead className="w-[250px]">Student Details</TableHead>
+                    <TableHead>Event Info</TableHead>
+                    <TableHead className="w-[200px]">Date & Location</TableHead>
+                    <TableHead className="text-right">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {loading ? (
+                    Array.from({ length: 3 }).map((_, i) => (
+                      <TableRow key={i}>
+                        <TableCell>
+                          <div className="space-y-2">
+                            <Skeleton className="h-4 w-[150px]" />
+                            <Skeleton className="h-3 w-[100px]" />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                           <div className="space-y-2">
+                            <Skeleton className="h-4 w-[200px]" />
+                            <Skeleton className="h-3 w-[150px]" />
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                           <div className="space-y-2">
+                            <Skeleton className="h-4 w-[120px]" />
+                            <Skeleton className="h-3 w-[80px]" />
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right flex justify-end">
+                           <Skeleton className="h-6 w-20 rounded-full" />
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  ) : records.length === 0 ? (
+                    <TableRow>
+                       <TableCell colSpan={4} className="h-48 text-center text-muted-foreground">
+                          <div className="flex flex-col items-center justify-center gap-2">
+                            <FileSearch className="h-8 w-8 text-muted-foreground/50" />
+                            <p>No processed OD records found for this period.</p>
+                          </div>
+                       </TableCell>
+                    </TableRow>
+                  ) : (
+                    records.map((record) => (
+                      <TableRow key={record.id} className="group">
+                        <TableCell>
+                          <div className="font-medium text-slate-900">{record.studentName}</div>
+                          <div className="text-sm text-muted-foreground font-mono mt-1">
+                            {record.studentRollNumber}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="font-medium">{record.eventName}</div>
+                          <div className="text-sm text-muted-foreground max-w-[300px] truncate mt-1">
+                            {record.eventDescription}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <div className="flex flex-col gap-2">
+                             <div className="flex items-center text-sm font-medium text-slate-700">
+                               <CalendarDays className="mr-2 h-4 w-4 text-slate-400" />
+                               {record.eventDate}
+                             </div>
+                             <div className="flex items-center text-sm text-muted-foreground">
+                               <MapPin className="mr-2 h-4 w-4 text-slate-400" />
+                               <span className="truncate max-w-[150px]">{record.eventLocation}</span>
+                             </div>
+                          </div>
+                        </TableCell>
+                        <TableCell className="text-right">
+                            {record.status === 'APPROVED' ? (
+                               <Badge className="bg-green-100 text-green-800 hover:bg-green-100 flex inline-flex items-center gap-1 border-green-200 ml-auto w-fit">
+                                  <CheckCircle className="h-3 w-3" /> Approved
+                               </Badge>
+                            ) : record.status === 'REJECTED' ? (
+                                <Badge className="bg-red-100 text-red-800 hover:bg-red-100 flex inline-flex items-center gap-1 border-red-200 ml-auto w-fit">
+                                    <XCircle className="h-3 w-3" /> Rejected
+                                </Badge>
+                            ) : (
+                                <Badge variant="outline" className="ml-auto w-fit border-slate-300">
+                                    {record.status}
+                                </Badge>
+                            )}
+                        </TableCell>
+                      </TableRow>
+                    ))
+                  )}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

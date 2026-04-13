@@ -1,12 +1,22 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext';
 import { api } from '../api';
 import type { ODRequest } from '../types';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Check, X, MapPin, CalendarDays, Inbox } from 'lucide-react';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
 export default function FacultyDashboard() {
-  const { userName, logout } = useAuth();
-  const navigate = useNavigate();
   const [pendingODs, setPendingODs] = useState<ODRequest[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
@@ -51,84 +61,136 @@ export default function FacultyDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100">
-      <nav className="bg-blue-600 text-white p-4">
-        <div className="container mx-auto flex justify-between items-center">
-          <h1 className="text-xl font-bold">Faculty Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <span>Welcome, {userName}</span>
-            <button
-              onClick={logout}
-              className="bg-blue-700 px-4 py-2 rounded hover:bg-blue-800"
-            >
-              Logout
-            </button>
-          </div>
-        </div>
-      </nav>
-
-      <div className="container mx-auto p-6">
-        <div className="flex gap-4 mb-6">
-          <button
-            onClick={() => navigate('/faculty/records')}
-            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 font-semibold"
-          >
-            View Records by Month
-          </button>
+    <div className="p-8 h-full overflow-auto">
+      <div className="flex flex-col gap-6 max-w-6xl mx-auto">
+        <div>
+          <h2 className="text-3xl font-bold tracking-tight">Pending Approvals</h2>
+          <p className="text-muted-foreground mt-2">
+            Review and manage student OD requests requiring your approval.
+          </p>
         </div>
 
-        <h2 className="text-xl font-bold mb-4">Pending OD Requests</h2>
-
-        {loading ? (
-          <p>Loading...</p>
-        ) : pendingODs.length === 0 ? (
-          <p className="text-gray-600">No pending OD requests.</p>
-        ) : (
-          <div className="grid gap-4">
-            {pendingODs.map((od) => (
-              <div
-                key={od.id}
-                className="bg-white border-l-4 border-yellow-500 rounded-lg p-4 shadow"
-              >
-                <div className="flex justify-between items-start">
-                  <div>
-                    <h3 className="font-bold text-lg">{od.eventName}</h3>
-                    <p className="mt-1 text-gray-600">
-                      <span className="font-semibold">Student:</span> {od.studentName} (
-                      {od.studentRollNumber})
-                    </p>
-                    <p>
-                      <span className="font-semibold">Location:</span> {od.eventLocation}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Date:</span> {od.eventDate}
-                    </p>
-                    <p>
-                      <span className="font-semibold">Description:</span>{' '}
-                      {od.eventDescription}
-                    </p>
-                  </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => handleApprove(od.id)}
-                      disabled={actionLoading === od.id}
-                      className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:opacity-50"
-                    >
-                      {actionLoading === od.id ? 'Processing...' : 'Approve'}
-                    </button>
-                    <button
-                      onClick={() => handleReject(od.id)}
-                      disabled={actionLoading === od.id}
-                      className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 disabled:opacity-50"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+        <Card>
+          <CardHeader>
+            <CardTitle>Needs Attention</CardTitle>
+            <CardDescription>You have {pendingODs.length} request(s) waiting.</CardDescription>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/50">
+                  <TableHead className="w-[250px]">Student Details</TableHead>
+                  <TableHead>Event Info</TableHead>
+                  <TableHead className="w-[200px]">Date & Location</TableHead>
+                  <TableHead className="text-right">Actions</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  Array.from({ length: 3 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell>
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-[150px]" />
+                          <Skeleton className="h-3 w-[100px]" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                         <div className="space-y-2">
+                          <Skeleton className="h-4 w-[200px]" />
+                          <Skeleton className="h-3 w-[150px]" />
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                         <div className="space-y-2">
+                          <Skeleton className="h-4 w-[120px]" />
+                          <Skeleton className="h-3 w-[80px]" />
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2">
+                           <Skeleton className="h-9 w-24" />
+                           <Skeleton className="h-9 w-24" />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : pendingODs.length === 0 ? (
+                  <TableRow>
+                     <TableCell colSpan={4} className="h-48 text-center text-muted-foreground">
+                        <div className="flex flex-col items-center justify-center gap-2">
+                          <Inbox className="h-8 w-8 text-muted-foreground/50" />
+                          <p>All caught up! No pending requests.</p>
+                        </div>
+                     </TableCell>
+                  </TableRow>
+                ) : (
+                  pendingODs.map((od) => (
+                    <TableRow key={od.id} className="group">
+                      <TableCell>
+                        <div className="font-medium text-slate-900">{od.studentName}</div>
+                        <div className="text-sm text-muted-foreground font-mono mt-1">
+                          {od.studentRollNumber}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="font-medium">{od.eventName}</div>
+                        <div className="text-sm text-muted-foreground max-w-[300px] truncate mt-1">
+                          {od.eventDescription}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div className="flex flex-col gap-2">
+                           <div className="flex items-center text-sm font-medium text-slate-700">
+                             <CalendarDays className="mr-2 h-4 w-4 text-slate-400" />
+                             {od.eventDate}
+                           </div>
+                           <div className="flex items-center text-sm text-muted-foreground">
+                             <MapPin className="mr-2 h-4 w-4 text-slate-400" />
+                             <span className="truncate max-w-[150px]">{od.eventLocation}</span>
+                           </div>
+                        </div>
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <div className="flex justify-end gap-2 opacity-100 transition-opacity">
+                          <Button
+                            variant="default"
+                            size="sm"
+                            className="bg-green-600 hover:bg-green-700"
+                            onClick={() => handleApprove(od.id)}
+                            disabled={actionLoading === od.id}
+                          >
+                            {actionLoading === od.id ? (
+                              'Processing...'
+                            ) : (
+                              <>
+                                <Check className="mr-1 h-4 w-4" /> Approve
+                              </>
+                            )}
+                          </Button>
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleReject(od.id)}
+                            disabled={actionLoading === od.id}
+                          >
+                             {actionLoading === od.id ? (
+                              'Processing...'
+                            ) : (
+                              <>
+                                <X className="mr-1 h-4 w-4" /> Reject
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                )}
+              </TableBody>
+            </Table>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
