@@ -1,7 +1,7 @@
 import { SidebarProvider, Sidebar, SidebarHeader, SidebarContent, SidebarGroup, SidebarGroupLabel, SidebarGroupContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { User2, Calendar, ShieldCheck, ChevronUp, LogOut } from "lucide-react"
+import { Calendar, ShieldCheck, ChevronUp, LogOut } from "lucide-react"
 import { useAuth } from "@/AuthContext"
 import { Link, useLocation } from "react-router-dom"
 
@@ -22,24 +22,20 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton 
-                    asChild 
+                    render={<Link to="/faculty/dashboard" />}
                     isActive={location.pathname === '/faculty/dashboard'}
                   >
-                    <Link to="/faculty/dashboard" className="flex items-center gap-2 w-full">
-                      <ShieldCheck className="h-4 w-4" />
-                      <span>Pending ODs</span>
-                    </Link>
+                    <ShieldCheck className="h-4 w-4" />
+                    <span>Pending ODs</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton 
-                    asChild 
+                    render={<Link to="/faculty/records" />}
                     isActive={location.pathname === '/faculty/records'}
                   >
-                    <Link to="/faculty/records" className="flex items-center gap-2 w-full">
-                      <Calendar className="h-4 w-4" />
-                      <span>OD Records</span>
-                    </Link>
+                    <Calendar className="h-4 w-4" />
+                    <span>OD Records</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -50,23 +46,25 @@ export function FacultyLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton
+                  <DropdownMenuTrigger
+                    render={
+                      <SidebarMenuButton
                       size="lg"
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-3 w-full"
-                    >
-                      <Avatar className="h-8 w-8 rounded-lg bg-blue-100 items-center justify-center">
-                        <AvatarFallback className="rounded-lg bg-blue-100 text-blue-700 font-bold">
-                           {userName?.charAt(0)?.toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">{userName}</span>
-                        <span className="truncate text-xs text-muted-foreground capitalize">{role?.toLowerCase()}</span>
-                      </div>
-                      <ChevronUp className="ml-auto size-4" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
+                      >
+                        <Avatar className="h-8 w-8 rounded-lg bg-blue-100 items-center justify-center">
+                          <AvatarFallback className="rounded-lg bg-blue-100 text-blue-700 font-bold">
+                             {userName?.charAt(0)?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-semibold">{userName}</span>
+                          <span className="truncate text-xs text-muted-foreground capitalize">{role?.toLowerCase()}</span>
+                        </div>
+                        <ChevronUp className="ml-auto size-4" />
+                      </SidebarMenuButton>
+                    }
+                  />
                   <DropdownMenuContent
                     side="top"
                     className="w-[--radix-popper-anchor-width]"

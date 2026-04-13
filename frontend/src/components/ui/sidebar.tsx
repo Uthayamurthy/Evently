@@ -40,6 +40,10 @@ type SidebarContextProps = {
   toggleSidebar: () => void
 }
 
+type SidebarTriggerClickEvent = Parameters<
+  NonNullable<React.ComponentProps<typeof Button>["onClick"]>
+>[0]
+
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
 
 function useSidebar() {
@@ -263,7 +267,7 @@ function SidebarTrigger({
       variant="ghost"
       size="icon-sm"
       className={cn(className)}
-      onClick={(event) => {
+      onClick={(event: SidebarTriggerClickEvent) => {
         onClick?.(event)
         toggleSidebar()
       }}

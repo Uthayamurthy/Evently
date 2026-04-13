@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { FileSearch, MapPin, CalendarDays, Search, CheckCircle, XCircle } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -91,7 +91,7 @@ export default function FacultyRecords() {
               </div>
               <div className="grid gap-2 w-full sm:w-[200px]">
                 <Label htmlFor="month">Month</Label>
-                <Select value={month} onValueChange={setMonth}>
+                <Select value={month} onValueChange={(value) => value && setMonth(value)}>
                   <SelectTrigger id="month">
                     <SelectValue placeholder="Select Month" />
                   </SelectTrigger>

@@ -22,24 +22,20 @@ export function StudentLayout({ children }: { children: React.ReactNode }) {
               <SidebarMenu>
                 <SidebarMenuItem>
                   <SidebarMenuButton 
-                    asChild 
+                    render={<Link to="/student/dashboard" />}
                     isActive={location.pathname === '/student/dashboard'}
                   >
-                    <Link to="/student/dashboard" className="flex items-center gap-2 w-full">
-                      <LayoutDashboard className="h-4 w-4" />
-                      <span>My Requests</span>
-                    </Link>
+                    <LayoutDashboard className="h-4 w-4" />
+                    <span>My Requests</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
                 <SidebarMenuItem>
                   <SidebarMenuButton 
-                    asChild 
+                    render={<Link to="/student/apply" />}
                     isActive={location.pathname === '/student/apply'}
                   >
-                    <Link to="/student/apply" className="flex items-center gap-2 w-full">
-                      <Send className="h-4 w-4" />
-                      <span>Apply for OD</span>
-                    </Link>
+                    <Send className="h-4 w-4" />
+                    <span>Apply for OD</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -50,23 +46,25 @@ export function StudentLayout({ children }: { children: React.ReactNode }) {
             <SidebarMenu>
               <SidebarMenuItem>
                 <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuButton
+                  <DropdownMenuTrigger
+                    render={
+                      <SidebarMenuButton
                       size="lg"
                       className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground flex items-center gap-3 w-full"
-                    >
-                      <Avatar className="h-8 w-8 rounded-lg bg-green-100 items-center justify-center">
-                        <AvatarFallback className="rounded-lg bg-green-100 text-green-700 font-bold">
-                           {userName?.charAt(0)?.toUpperCase()}
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">{userName}</span>
-                        <span className="truncate text-xs text-muted-foreground capitalize">{role?.toLowerCase()}</span>
-                      </div>
-                      <ChevronUp className="ml-auto size-4" />
-                    </SidebarMenuButton>
-                  </DropdownMenuTrigger>
+                      >
+                        <Avatar className="h-8 w-8 rounded-lg bg-green-100 items-center justify-center">
+                          <AvatarFallback className="rounded-lg bg-green-100 text-green-700 font-bold">
+                             {userName?.charAt(0)?.toUpperCase()}
+                          </AvatarFallback>
+                        </Avatar>
+                        <div className="grid flex-1 text-left text-sm leading-tight">
+                          <span className="truncate font-semibold">{userName}</span>
+                          <span className="truncate text-xs text-muted-foreground capitalize">{role?.toLowerCase()}</span>
+                        </div>
+                        <ChevronUp className="ml-auto size-4" />
+                      </SidebarMenuButton>
+                    }
+                  />
                   <DropdownMenuContent
                     side="top"
                     className="w-[--radix-popper-anchor-width]"
