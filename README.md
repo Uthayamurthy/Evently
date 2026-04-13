@@ -164,10 +164,38 @@ The frontend does not have a faculty registration page. Create faculty users thr
 
 ### Register a Faculty User
 
-Run this after the gateway service and faculty service are up:
+Run one of these after the gateway service and faculty service are up.
+
+Local development:
 
 ```bash
 curl -X POST http://localhost:8080/api/faculty/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "facultyName": "Test Faculty",
+    "facultyId": "FAC001",
+    "emailId": "faculty@test.com",
+    "password": "pass123"
+  }'
+```
+
+Docker deployment:
+
+```bash
+curl -X POST http://localhost/api/faculty/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "facultyName": "Test Faculty",
+    "facultyId": "FAC001",
+    "emailId": "faculty@test.com",
+    "password": "pass123"
+  }'
+```
+
+If you started Docker with a custom frontend host port, use that port instead:
+
+```bash
+curl -X POST http://localhost:8088/api/faculty/register \
   -H "Content-Type: application/json" \
   -d '{
     "facultyName": "Test Faculty",
