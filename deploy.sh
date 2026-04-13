@@ -33,23 +33,21 @@ until docker compose exec -T mongodb mongosh --eval "db.adminCommand('ping')" &>
 done
 echo "     MongoDB is ready!"
 
-# Wait for gateway
-echo "   - Gateway Service..."
-until curl -s http://localhost:8080/actuator/health &>/dev/null 2>/dev/null || curl -s http://localhost:8080 &>/dev/null; do
+# Wait for frontend
+FRONTEND_PORT="${FRONTEND_PORT:-80}"
+echo "   - Frontend on port ${FRONTEND_PORT}..."
+until curl -s "http://localhost:${FRONTEND_PORT}" &>/dev/null; do
     sleep 2
 done
-echo "     Gateway is ready!"
+echo "     Frontend is reachable!"
 
 echo ""
 echo "=== Deployment Complete ==="
 echo ""
 echo "Services:"
-echo "  Frontend:     http://localhost"
-echo "  Gateway:      http://localhost:8080"
-echo "  Student API:  http://localhost:8081"
-echo "  Faculty API:  http://localhost:8082"
-echo "  Event API:     http://localhost:8083"
-echo "  MongoDB:       localhost:27017"
+echo "  Frontend:     http://localhost:${FRONTEND_PORT}"
+echo "  Backend APIs: internal Docker network only"
+echo "  MongoDB:      internal Docker network only"
 echo ""
 echo "Useful commands:"
 echo "  View logs:    docker compose logs -f"

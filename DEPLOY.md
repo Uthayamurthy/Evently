@@ -225,11 +225,19 @@ docker compose up -d
 
 | Service | Port | Description |
 |---------|------|-------------|
-| Frontend | 80 | React app via Nginx |
-| Gateway | 8080 | API gateway |
-| Student | 8081 | Student microservice |
-| Faculty | 8082 | Faculty microservice |
-| Event | 8083 | Event microservice |
-| MongoDB | 27017 | Database (internal only) |
+| Frontend | 80 by default | React app via Nginx |
+| Gateway | Not exposed | Internal Docker network only |
+| Student | Not exposed | Internal Docker network only |
+| Faculty | Not exposed | Internal Docker network only |
+| Event | Not exposed | Internal Docker network only |
+| MongoDB | Not exposed | Internal Docker network only |
 
 Only port 80 needs to be exposed via Cloudflare Tunnel.
+
+If port `80` is already in use on your Pi, choose another host port:
+
+```bash
+FRONTEND_PORT=8088 docker compose up -d --build
+```
+
+Then point Cloudflare Tunnel at `http://localhost:8088`.
